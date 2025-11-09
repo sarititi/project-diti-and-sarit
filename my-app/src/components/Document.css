@@ -1,0 +1,90 @@
+/* src/components/Document.css */
+.document {
+  width: 300px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.document:hover {
+  border-color: #2196F3;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.document.active {
+  border-color: #2196F3;
+  background: #e3f2fd;
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+}
+
+.document-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+}
+
+.document-name {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.close-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #d32f2f;
+  transform: scale(1.1);
+}
+
+.document-display {
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  line-height: 1.8;
+  direction: rtl;
+  text-align: right;
+  word-wrap: break-word;
+  white-space: pre-wrap; /* שומר על רווחים ושורות חדשות */
+}
+
+.placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.active-indicator {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #4CAF50;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
