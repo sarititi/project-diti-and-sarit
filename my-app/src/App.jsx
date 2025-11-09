@@ -36,37 +36,60 @@
 
 import { useState } from 'react';
 import './App.css';
+import Header from './components/Header';  // ← הוסיפי!
 import Document from './components/Document';
 import VirtualKeyboard from './components/VirtualKeyboard';
+import StyleControls from './components/StyleControls';
 
 function App() {
-  const [language, setLanguage] = useState('hebrew');
+  const [currentUser, setCurrentUser] = useState('user1');  // ← הוסיפי!
+ 
   const [documents, setDocuments] = useState([{
     id: 1,
     name: "מסמך ניסיון",
     content: []
   }]);
 
-  const addChar = (char) => {
+  const [currentStyle, setCurrentStyle] = useState({
+    font: 'Arial',
+    size: 20,
+    color: '#000000'
+  });
+
+  const handleCharacterClick = (char) => {
     setDocuments(prev => prev.map(doc => {
       if (doc.id === 1) {
         return {
           ...doc,
-          content: [...doc.content, {
-            text: char,
-            style: { font: 'Arial', size: 20, color: '#000' }
-          }]
+          content: [
+            ...doc.content,
+            {
+              text: char,
+              style: { ...currentStyle }
+            }
+          ]
         };
       }
       return doc;
     }));
   };
 
+  const handleStyleChange = (newStyle) => {
+    setCurrentStyle(prev => ({ ...prev, ...newStyle }));
+  };
+
+  const handleUserChange = (newUser) => {
+    setCurrentUser(newUser);
+    // בעתיד: כאן נטען את המסמכים של המשתמש החדש מ-LocalStorage
+  };
+
   return (
     <div className="app">
-      <h1 style={{textAlign: 'center', padding: '20px', color: 'white'}}>
-        📝 עורך טקסט
-      </h1>
+      {/* הכותרת החדשה! */}
+      <Header
+        currentUser={currentUser}
+        onUserChange={handleUserChange}
+      />
      
       <main style={{maxWidth: '900px', margin: '20px auto', padding: '20px'}}>
         <Document
@@ -76,13 +99,14 @@ function App() {
           onClose={() => {}}
         />
        
-        <div style={{marginTop: '30px'}}>
-          <VirtualKeyboard
-            language={language}
-            onKeyPress={addChar}
-            onLanguageChange={setLanguage}
-          />
-        </div>
+        <StyleControls
+          currentStyle={currentStyle}
+          onStyleChange={handleStyleChange}
+        />
+       
+        <VirtualKeyboard
+          onCharacterClick={handleCharacterClick}
+        />
       </main>
     </div>
   );

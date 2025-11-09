@@ -1,0 +1,92 @@
+
+.style-controls {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.style-controls h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  text-align: center;
+}
+
+.controls-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group label {
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.control-group select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  background: white;
+  transition: border-color 0.3s;
+}
+
+.control-group select:hover {
+  border-color: #2196F3;
+}
+
+.control-group select:focus {
+  outline: none;
+  border-color: #2196F3;
+}
+
+.color-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.color-btn {
+  width: 35px;
+  height: 35px;
+  border: 3px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.color-btn:hover {
+  transform: scale(1.15);
+  border-color: #2196F3;
+}
+
+.color-btn.active {
+  border-color: #2196F3;
+  border-width: 4px;
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+
+.preview {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px dashed #ddd;
+}
+
+.preview span:first-child {
+  color: #666;
+  font-size: 14px;
+}
