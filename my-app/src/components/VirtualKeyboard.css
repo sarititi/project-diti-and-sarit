@@ -1,0 +1,213 @@
+
+.virtual-keyboard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* כותרת המקלדת */
+.keyboard-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* בורר שפה */
+.language-selector {
+  position: relative;
+}
+
+.current-language-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 25px;
+  background: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  justify-content: space-between;
+}
+
+.current-language-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.language-icon {
+  font-size: 24px;
+}
+
+.language-name {
+  flex: 1;
+  text-align: center;
+  color: #333;
+}
+
+.dropdown-arrow {
+  color: #666;
+  font-size: 12px;
+}
+
+/* תפריט בחירת שפה */
+.language-menu {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 200px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 20px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: right;
+  font-size: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.language-option:last-child {
+  border-bottom: none;
+}
+
+.language-option:hover {
+  background: #f5f5f5;
+}
+
+.language-option.active {
+  background: #e3f2fd;
+  font-weight: bold;
+}
+
+.check-mark {
+  margin-right: auto;
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* שורות המקלדת */
+.keyboard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.keyboard-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* כפתורי המקלדת */
+.key-button {
+  min-width: 50px;
+  height: 50px;
+  padding: 10px;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.key-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+}
+
+.key-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* כפתור רווח */
+.space-key {
+  min-width: 300px;
+  font-size: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.space-key:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+/* כפתורי אימוג'י */
+.emoji-key {
+  font-size: 28px;
+  min-width: 55px;
+  height: 55px;
+}
+
+.emoji-key:hover {
+  background: #fff9e6;
+  transform: scale(1.15) translateY(-2px);
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .virtual-keyboard {
+    padding: 15px;
+  }
+
+  .key-button {
+    min-width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .emoji-key {
+    font-size: 24px;
+    min-width: 45px;
+    height: 45px;
+  }
+
+  .space-key {
+    min-width: 200px;
+  }
+
+  .language-menu {
+    min-width: 180px;
+  }
+}

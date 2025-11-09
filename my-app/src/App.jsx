@@ -2,22 +2,26 @@
 import { useState } from 'react';
 import './App.css';
 import Header from './components/Header';
-import DocumentsContainer from './components/DocumentsContainer';  // ← הוסיפי!
+import DocumentsContainer from './components/DocumentsContainer';
 import VirtualKeyboard from './components/VirtualKeyboard';
 import StyleControls from './components/StyleControls';
 import ActionButtons from './components/ActionButtons';
 import FileManager from './components/FileManager';
 
 function App() {
+  // ===============================
+  // State ראשי
+  // ===============================
+ 
   const [currentUser, setCurrentUser] = useState('user1');
  
-  // ⭐ עכשיו יש מערך של מסמכים + מסמך פעיל
   const [documents, setDocuments] = useState([{
     id: 1,
     name: "מסמך 1",
     content: []
   }]);
-  const [activeDocId, setActiveDocId] = useState(1);  // ← ID של המסמך הפעיל
+ 
+  const [activeDocId, setActiveDocId] = useState(1);
 
   const [currentStyle, setCurrentStyle] = useState({
     font: 'Arial',
@@ -25,9 +29,12 @@ function App() {
     color: '#000000'
   });
 
-  const [history, setHistory] = useState([]);
+  // ⭐ היסטוריה נפרדת לכל מסמך!
+  const [history, setHistory] = useState({
+    1: []  // מסמך 1 מתחיל עם היסטוריה ריקה
+  });
 
-  // ⭐ מציאת המסמך הפעיל
+  // מציאת המסמך הפעיל
   const activeDoc = documents.find(d => d.id === activeDocId);
 
   // ===============================
@@ -43,7 +50,13 @@ function App() {
       content: []
     };
     setDocuments([...documents, newDoc]);
-    setActiveDocId(newId);  // עבור למסמך החדש
+    setActiveDocId(newId);
+   
+    // ⭐ יצירת היסטוריה ריקה למסמך החדש
+    setHistory(prev => ({
+      ...prev,
+      [newId]: []
+    }));
   };
 
   // סגירת מסמך
@@ -61,12 +74,20 @@ function App() {
         const remainingDocs = documents.filter(d => d.id !== id);
         setActiveDocId(remainingDocs[0].id);
       }
+     
+      // ⭐ מחיקת היסטוריה של המסמך שנסגר
+      setHistory(prev => {
+        const newHistory = { ...prev };
+        delete newHistory[id];
+        return newHistory;
+      });
     }
   };
 
   // מעבר בין מסמכים
   const handleSwitchDoc = (id) => {
     setActiveDocId(id);
+    // ⭐ לא מוחקים כלום! כל מסמך שומר את ההיסטוריה שלו
   };
 
   // ===============================
@@ -75,10 +96,14 @@ function App() {
  
   const handleCharacterClick = (char) => {
     setDocuments(prev => {
-      setHistory(h => [...h, prev]);
+      // ⭐ שמור את המצב הנוכחי להיסטוריה של המסמך הפעיל
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
      
       return prev.map(doc => {
-        if (doc.id === activeDocId) {  // ← רק למסמך הפעיל!
+        if (doc.id === activeDocId) {
           return {
             ...doc,
             content: [
@@ -99,7 +124,34 @@ function App() {
   // פונקציות - עיצוב
   // ===============================
  
+  // שינוי סטייל לתווים חדשים בלבד
   const handleStyleChange = (newStyle) => {
+    setCurrentStyle(prev => ({ ...prev, ...newStyle }));
+  };
+
+  // החלת סטייל על כל הטקסט הקיים
+  const handleApplyStyleToAll = (newStyle) => {
+    setDocuments(prev => {
+      // ⭐ שמור להיסטוריה של המסמך הפעיל
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
+     
+      return prev.map(doc => {
+        if (doc.id === activeDocId) {
+          return {
+            ...doc,
+            content: doc.content.map(char => ({
+              ...char,
+              style: { ...char.style, ...newStyle }
+            }))
+          };
+        }
+        return doc;
+      });
+    });
+   
     setCurrentStyle(prev => ({ ...prev, ...newStyle }));
   };
 
@@ -115,16 +167,22 @@ function App() {
       content: []
     }]);
     setActiveDocId(1);
-    setHistory([]);
+    // ⭐ איפוס כל ההיסטוריה
+    setHistory({ 1: [] });
   };
 
   // ===============================
   // פונקציות - פעולות מחיקה
   // ===============================
  
+  // מחיקת תו אחרון
   const handleDeleteChar = () => {
     setDocuments(prev => {
-      setHistory(h => [...h, prev]);
+      // ⭐ שמור להיסטוריה של המסמך הפעיל
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
      
       return prev.map(doc => {
         if (doc.id === activeDocId && doc.content.length > 0) {
@@ -138,9 +196,14 @@ function App() {
     });
   };
 
+  // מחיקת מילה אחרונה
   const handleDeleteWord = () => {
     setDocuments(prev => {
-      setHistory(h => [...h, prev]);
+      // ⭐ שמור להיסטוריה של המסמך הפעיל
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
      
       return prev.map(doc => {
         if (doc.id === activeDocId) {
@@ -161,10 +224,15 @@ function App() {
     });
   };
 
+  // מחיקת כל הטקסט
   const handleDeleteAll = () => {
     if (window.confirm('למחוק את כל הטקסט?')) {
       setDocuments(prev => {
-        setHistory(h => [...h, prev]);
+        // ⭐ שמור להיסטוריה של המסמך הפעיל
+        setHistory(h => ({
+          ...h,
+          [activeDocId]: [...(h[activeDocId] || []), prev]
+        }));
        
         return prev.map(doc => {
           if (doc.id === activeDocId) {
@@ -176,11 +244,19 @@ function App() {
     }
   };
 
+  // Undo - ביטול פעולה אחרונה
   const handleUndo = () => {
-    if (history.length > 0) {
-      const lastState = history[history.length - 1];
+    const docHistory = history[activeDocId] || [];
+   
+    if (docHistory.length > 0) {
+      const lastState = docHistory[docHistory.length - 1];
       setDocuments(lastState);
-      setHistory(h => h.slice(0, -1));
+     
+      // ⭐ הסר רק מההיסטוריה של המסמך הפעיל
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: docHistory.slice(0, -1)
+      }));
     }
   };
 
@@ -193,7 +269,6 @@ function App() {
   };
 
   const handleOpenFile = (loadedDoc) => {
-    // פתיחת קובץ כמסמך חדש
     const newId = Math.max(...documents.map(d => d.id)) + 1;
     const newDoc = {
       ...loadedDoc,
@@ -201,7 +276,12 @@ function App() {
     };
     setDocuments([...documents, newDoc]);
     setActiveDocId(newId);
-    setHistory([]);
+   
+    // ⭐ יצירת היסטוריה ריקה למסמך הנפתח
+    setHistory(prev => ({
+      ...prev,
+      [newId]: []
+    }));
   };
 
   // ===============================
@@ -217,7 +297,6 @@ function App() {
      
       <main style={{maxWidth: '1200px', margin: '20px auto', padding: '20px'}}>
        
-        {/* ⭐ מכל המסמכים */}
         <DocumentsContainer
           documents={documents}
           activeId={activeDocId}
@@ -226,30 +305,27 @@ function App() {
           onNewDoc={handleNewDoc}
         />
        
-        {/* ניהול קבצים */}
         <FileManager
           currentUser={currentUser}
-          currentDoc={activeDoc}  // ← המסמך הפעיל
+          currentDoc={activeDoc}
           onSave={handleSaveFile}
           onOpen={handleOpenFile}
         />
        
-        {/* כפתורי פעולות */}
         <ActionButtons
           onDeleteChar={handleDeleteChar}
           onDeleteWord={handleDeleteWord}
           onDeleteAll={handleDeleteAll}
           onUndo={handleUndo}
-          canUndo={history.length > 0}
+          canUndo={(history[activeDocId] || []).length > 0}  // ⭐ בדיקה לפי המסמך הפעיל
         />
        
-        {/* כפתורי עיצוב */}
         <StyleControls
           currentStyle={currentStyle}
           onStyleChange={handleStyleChange}
+          onApplyToAll={handleApplyStyleToAll}
         />
        
-        {/* מקלדת */}
         <VirtualKeyboard
           onCharacterClick={handleCharacterClick}
         />
