@@ -1,0 +1,174 @@
+
+.file-manager {
+  background: #e8f5e9;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.file-manager h3 {
+  margin: 0 0 15px 0;
+  color: #2e7d32;
+  text-align: center;
+}
+
+.file-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.file-btn {
+  padding: 12px 30px;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+  color: #2e7d32;
+}
+
+.file-btn:hover {
+  background: #4caf50;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.save-btn:hover {
+  background: #66bb6a;
+  border-color: #66bb6a;
+}
+
+.open-btn:hover {
+  background: #42a5f5;
+  border-color: #42a5f5;
+}
+
+/* Modal */
+.file-list-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 70vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  background: #4caf50;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h4 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-modal {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-modal:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}
+
+.files-container {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-files {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.file-item:hover {
+  border-color: #4caf50;
+  background: #f1f8e9;
+}
+
+.file-name {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.file-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.open-file-btn,
+.delete-file-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.open-file-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.open-file-btn:hover {
+  background: #45a049;
+}
+
+.delete-file-btn {
+  background: #f44336;
+  color: white;
+  font-size: 16px;
+}
+
+.delete-file-btn:hover {
+  background: #d32f2f;
+  transform: scale(1.1);
+}
