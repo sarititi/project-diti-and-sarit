@@ -7,6 +7,7 @@ import VirtualKeyboard from './components/VirtualKeyboard';
 import StyleControls from './components/StyleControls';
 import ActionButtons from './components/ActionButtons';
 import FileManager from './components/FileManager';
+import SearchReplace from './components/SearchReplace';
 
 function App() {
   // ===============================
@@ -261,6 +262,60 @@ function App() {
   };
 
   // ===============================
+  // פונקציות - חיפוש והחלפה
+  // ===============================
+ 
+  // הדגשת תו (אופציונלי - אם רוצה אפקט ויזואלי)
+  const handleHighlight = (index) => {
+    console.log(`מדגיש תו במיקום ${index}`);
+    // אפשר להוסיף אפקט ויזואלי בעתיד
+  };
+
+  // החלפת תו בודד
+  const handleReplace = (index, newChar) => {
+    setDocuments(prev => {
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
+     
+      return prev.map(doc => {
+        if (doc.id === activeDocId) {
+          const newContent = [...doc.content];
+          newContent[index] = {
+            ...newContent[index],
+            text: newChar
+          };
+          return { ...doc, content: newContent };
+        }
+        return doc;
+      });
+    });
+  };
+
+  // החלפת כל המופעים
+  const handleReplaceAll = (searchChar, replaceChar) => {
+    setDocuments(prev => {
+      setHistory(h => ({
+        ...h,
+        [activeDocId]: [...(h[activeDocId] || []), prev]
+      }));
+     
+      return prev.map(doc => {
+        if (doc.id === activeDocId) {
+          const newContent = doc.content.map(char =>
+            char.text === searchChar
+              ? { ...char, text: replaceChar }
+              : char
+          );
+          return { ...doc, content: newContent };
+        }
+        return doc;
+      });
+    });
+  };
+
+  // ===============================
   // פונקציות - ניהול קבצים
   // ===============================
  
@@ -312,12 +367,19 @@ function App() {
           onOpen={handleOpenFile}
         />
        
+        <SearchReplace
+          currentDoc={activeDoc}
+          onHighlight={handleHighlight}
+          onReplace={handleReplace}
+          onReplaceAll={handleReplaceAll}
+        />
+       
         <ActionButtons
           onDeleteChar={handleDeleteChar}
           onDeleteWord={handleDeleteWord}
           onDeleteAll={handleDeleteAll}
           onUndo={handleUndo}
-          canUndo={(history[activeDocId] || []).length > 0}  // ⭐ בדיקה לפי המסמך הפעיל
+          canUndo={(history[activeDocId] || []).length > 0}
         />
        
         <StyleControls
