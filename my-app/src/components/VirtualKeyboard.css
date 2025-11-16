@@ -1,17 +1,48 @@
+/* VirtualKeyboard.css - מקלדת מרהיבה */
 
 .virtual-keyboard {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
 }
 
-/* כותרת המקלדת */
-.keyboard-header {
+/* שורת כפתורים עליונה */
+.keyboard-top-row {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* כפתורים אחידים */
+.keyboard-btn {
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #2c3e50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.keyboard-btn:hover {
+  background: #f8f9fa;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.keyboard-btn:active {
+  transform: translateY(-1px);
+}
+
+.keyboard-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* בורר שפה */
@@ -20,80 +51,66 @@
 }
 
 .current-language-btn {
+  background: white;
+  min-width: 130px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 25px;
-  background: white;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  min-width: 180px;
+  gap: 6px;
   justify-content: space-between;
 }
 
-.current-language-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
 .language-icon {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .language-name {
   flex: 1;
   text-align: center;
-  color: #333;
 }
 
 .dropdown-arrow {
-  color: #666;
-  font-size: 12px;
+  font-size: 10px;
 }
 
-/* תפריט בחירת שפה */
+/* תפריט שפות */
 .language-menu {
   position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50px;
+  left: 0;
   background: white;
-  border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   z-index: 100;
-  min-width: 200px;
+  min-width: 160px;
   animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
 }
 
 .language-option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 15px 20px;
+  padding: 12px 15px;
   background: white;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
   text-align: right;
-  font-size: 15px;
+  font-size: 14px;
+  color: #2c3e50;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -102,7 +119,7 @@
 }
 
 .language-option:hover {
-  background: #f5f5f5;
+  background: #f8f9fa;
 }
 
 .language-option.active {
@@ -113,38 +130,79 @@
 .check-mark {
   margin-right: auto;
   color: #4CAF50;
-  font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
+}
+
+/* כפתורי פעולה - צבעים יפים */
+.delete-char {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+}
+
+.delete-word {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #c62828;
+}
+
+.undo {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+}
+
+.delete-all {
+  background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
+  color: #b71c1c;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+}
+
+.open-btn {
+  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+  color: #01579b;
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+  color: #4a148c;
 }
 
 /* שורות המקלדת */
 .keyboard-rows {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid #2c3e50;
+  border-radius: 15px;
+  backdrop-filter: blur(5px);
 }
 
 .keyboard-row {
   display: flex;
-  gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
-/* כפתורי המקלדת */
+/* מקשי מקלדת */
 .key-button {
-  min-width: 50px;
-  height: 50px;
+  min-width: 45px;
+  height: 45px;
   padding: 10px;
   background: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  color: #333;
+  color: #2c3e50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,62 +210,72 @@
 
 .key-button:hover {
   background: #f0f0f0;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .key-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* כפתור רווח */
 .space-key {
-  min-width: 300px;
-  font-size: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  min-width: 280px;
+  background: linear-gradient(135deg, #e8eef3 0%, #d5dde5 100%);
 }
 
 .space-key:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  background: linear-gradient(135deg, #d5dde5 0%, #c5ced8 100%);
 }
 
-/* כפתורי אימוג'י */
+/* אימוג'י */
 .emoji-key {
-  font-size: 28px;
-  min-width: 55px;
-  height: 55px;
+  font-size: 24px;
+  min-width: 50px;
+  height: 50px;
 }
 
 .emoji-key:hover {
-  background: #fff9e6;
   transform: scale(1.15) translateY(-2px);
 }
 
 /* responsive */
-@media (max-width: 768px) {
-  .virtual-keyboard {
-    padding: 15px;
-  }
-
+@media (max-width: 1024px) {
   .key-button {
     min-width: 40px;
     height: 40px;
     font-size: 16px;
   }
-
-  .emoji-key {
-    font-size: 24px;
-    min-width: 45px;
-    height: 45px;
-  }
-
+  
   .space-key {
-    min-width: 200px;
+    min-width: 220px;
   }
+}
 
-  .language-menu {
+@media (max-width: 768px) {
+  .keyboard-top-row {
+    gap: 6px;
+  }
+  
+  .keyboard-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .key-button {
+    min-width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .emoji-key {
+    font-size: 20px;
+    min-width: 40px;
+    height: 40px;
+  }
+  
+  .space-key {
     min-width: 180px;
   }
 }

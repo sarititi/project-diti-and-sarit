@@ -1,54 +1,192 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* FileManager.css - ניהול קבצים */
+
+.file-manager {
+  display: flex;
+  gap: 10px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* הכפתורים מוגדרים ב-VirtualKeyboard.css */
+
+/* Modal רשימת קבצים */
+.file-list-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
-@keyframes logo-spin {
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 550px;
+  max-height: 75vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-.card {
-  padding: 2em;
+.modal-header {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.read-the-docs {
-  color: #888;
-}
-
-.app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
+.modal-header h4 {
   margin: 0;
-  padding: 0;
+  font-size: 22px;
+}
+
+.close-modal {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.files-container {
+  padding: 25px;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.files-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.files-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.files-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  border-radius: 10px;
+}
+
+.no-files {
+  text-align: center;
+  color: #999;
+  padding: 50px 20px;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+  background: white;
+}
+
+.file-item:hover {
+  border-color: #4caf50;
+  background: #f1f8e9;
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+.file-name {
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.file-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.open-file-btn,
+.delete-file-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  font-size: 14px;
+  color: white;
+}
+
+.open-file-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+}
+
+.open-file-btn:hover {
+  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.delete-file-btn {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+}
+
+.delete-file-btn:hover {
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .file-item {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .file-actions {
+    width: 100%;
+    justify-content: center;
+  }
 }

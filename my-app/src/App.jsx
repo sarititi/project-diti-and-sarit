@@ -9,6 +9,16 @@ import ActionButtons from './components/ActionButtons';
 import FileManager from './components/FileManager';
 import SearchReplace from './components/SearchReplace';
 
+// import { useState } from 'react';
+// import './App_FINAL.css';
+// import Header from './components/Header';
+// import DocumentsContainer from './components/DocumentsContainer';
+// import VirtualKeyboard from './components/VirtualKeyboard';
+// import StyleControls from './components/StyleControls';
+// import ActionButtons from './components/ActionButtons';
+// import FileManager from './components/FileManager';
+// import SearchReplace from './components/SearchReplace';
+
 function App() {
   // ===============================
   // State ראשי
@@ -25,9 +35,10 @@ function App() {
   const [activeDocId, setActiveDocId] = useState(1);
 
   const [currentStyle, setCurrentStyle] = useState({
-    font: 'Arial',
-    size: 20,
-    color: '#000000'
+    fontFamily: 'Arial',
+    fontSize: '20px',
+    color: '#000000',
+    applyMode: 'forward' // 'forward' או 'selected'
   });
 
   // ⭐ היסטוריה נפרדת לכל מסמך!
@@ -37,6 +48,7 @@ function App() {
 
   // מציאת המסמך הפעיל
   const activeDoc = documents.find(d => d.id === activeDocId);
+  const otherDocs = documents.filter(d => d.id !== activeDocId);
 
   // ===============================
   // פונקציות - ניהול מסמכים
@@ -110,8 +122,10 @@ function App() {
             content: [
               ...doc.content,
               {
-                text: char,
-                style: { ...currentStyle }
+                char: char,
+                fontFamily: currentStyle.fontFamily,
+                fontSize: currentStyle.fontSize,
+                color: currentStyle.color
               }
             ]
           };
@@ -125,9 +139,12 @@ function App() {
   // פונקציות - עיצוב
   // ===============================
  
-  // שינוי סטייל לתווים חדשים בלבד
+  // שינוי סטייל (כולל מצב החלה)
   const handleStyleChange = (newStyle) => {
     setCurrentStyle(prev => ({ ...prev, ...newStyle }));
+    
+    // אם במצב "לקטע מסומן" ויש טקסט מסומן - החל על המסומן
+    // (זה ידרש הוספת selection state בעתיד)
   };
 
   // החלת סטייל על כל הטקסט הקיים
@@ -143,9 +160,11 @@ function App() {
         if (doc.id === activeDocId) {
           return {
             ...doc,
-            content: doc.content.map(char => ({
-              ...char,
-              style: { ...char.style, ...newStyle }
+            content: doc.content.map(charObj => ({
+              ...charObj,
+              fontFamily: newStyle.fontFamily || charObj.fontFamily,
+              fontSize: newStyle.fontSize || charObj.fontSize,
+              color: newStyle.color || charObj.color
             }))
           };
         }
@@ -210,11 +229,11 @@ function App() {
         if (doc.id === activeDocId) {
           let content = [...doc.content];
          
-          while (content.length > 0 && content[content.length - 1].text === ' ') {
+          while (content.length > 0 && content[content.length - 1].char === ' ') {
             content.pop();
           }
          
-          while (content.length > 0 && content[content.length - 1].text !== ' ') {
+          while (content.length > 0 && content[content.length - 1].char !== ' ') {
             content.pop();
           }
          
@@ -284,7 +303,7 @@ function App() {
           const newContent = [...doc.content];
           newContent[index] = {
             ...newContent[index],
-            text: newChar
+            char: newChar
           };
           return { ...doc, content: newContent };
         }
@@ -303,10 +322,10 @@ function App() {
      
       return prev.map(doc => {
         if (doc.id === activeDocId) {
-          const newContent = doc.content.map(char =>
-            char.text === searchChar
-              ? { ...char, text: replaceChar }
-              : char
+          const newContent = doc.content.map(charObj =>
+            charObj.char === searchChar
+              ? { ...charObj, char: replaceChar }
+              : charObj
           );
           return { ...doc, content: newContent };
         }
@@ -340,7 +359,7 @@ function App() {
   };
 
   // ===============================
-  // תצוגה
+  // תצוגה - מבנה חדש!
   // ===============================
  
   return (
@@ -350,49 +369,131 @@ function App() {
         onUserChange={handleUserChange}
       />
      
-      <main style={{maxWidth: '1200px', margin: '20px auto', padding: '20px'}}>
-       
-        <DocumentsContainer
-          documents={documents}
-          activeId={activeDocId}
-          onSwitch={handleSwitchDoc}
-          onClose={handleCloseDoc}
-          onNewDoc={handleNewDoc}
-        />
-       
-        <FileManager
-          currentUser={currentUser}
-          currentDoc={activeDoc}
-          onSave={handleSaveFile}
-          onOpen={handleOpenFile}
-        />
-       
-        <SearchReplace
-          currentDoc={activeDoc}
-          onHighlight={handleHighlight}
-          onReplace={handleReplace}
-          onReplaceAll={handleReplaceAll}
-        />
-       
-        <ActionButtons
-          onDeleteChar={handleDeleteChar}
-          onDeleteWord={handleDeleteWord}
-          onDeleteAll={handleDeleteAll}
-          onUndo={handleUndo}
-          canUndo={(history[activeDocId] || []).length > 0}
-        />
-       
-        <StyleControls
-          currentStyle={currentStyle}
-          onStyleChange={handleStyleChange}
-          onApplyToAll={handleApplyStyleToAll}
-        />
-       
-        <VirtualKeyboard
-          onCharacterClick={handleCharacterClick}
-        />
-       
-      </main>
+      <div className="main-container">
+        {/* אזור המסך - 60% */}
+        <div className="screen-area">
+          {/* מסמך פעיל גדול */}
+          <div className="main-document">
+            {activeDoc && (
+              <>
+                <div className="document-header">
+                  <div className="document-name">{activeDoc.name}</div>
+                  <button 
+                    className="close-btn"
+                    onClick={() => handleCloseDoc(activeDoc.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="document-display">
+                  {activeDoc.content.length === 0 ? (
+                    <span className="placeholder">התחילי לכתוב...</span>
+                  ) : (
+                    activeDoc.content.map((charObj, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          fontFamily: charObj.fontFamily,
+                          fontSize: charObj.fontSize,
+                          color: charObj.color
+                        }}
+                      >
+                        {charObj.char}
+                      </span>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          
+          {/* רשימת מסמכים בצד */}
+          <div className="documents-sidebar">
+            <div className="sidebar-header">
+              <h3>המסמכים שלי</h3>
+              <button className="new-doc-btn" onClick={handleNewDoc}>
+                + מסמך חדש
+              </button>
+            </div>
+            
+            <div className="documents-scroll-list">
+              {otherDocs.length === 0 ? (
+                <div className="no-documents">אין מסמכים נוספים</div>
+              ) : (
+                otherDocs.map(doc => (
+                  <div
+                    key={doc.id}
+                    className="sidebar-doc"
+                    onClick={() => handleSwitchDoc(doc.id)}
+                  >
+                    <div className="document-header">
+                      <div className="document-name">{doc.name}</div>
+                      <button 
+                        className="close-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCloseDoc(doc.id);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="document-display">
+                      {doc.content.length === 0 ? (
+                        <span className="placeholder">ריק</span>
+                      ) : (
+                        doc.content.slice(0, 20).map((charObj, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              fontFamily: charObj.fontFamily,
+                              fontSize: charObj.fontSize,
+                              color: charObj.color
+                            }}
+                          >
+                            {charObj.char}
+                          </span>
+                        ))
+                      )}
+                      {doc.content.length > 20 && '...'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* אזור המקלדת - 40% */}
+        <div className="keyboard-area">
+          {/* מקלדת ראשית - 65% */}
+          <div className="keyboard-main">
+            <VirtualKeyboard
+              onCharacterClick={handleCharacterClick}
+              onDeleteChar={handleDeleteChar}
+              onDeleteWord={handleDeleteWord}
+              onDeleteAll={handleDeleteAll}
+              onUndo={handleUndo}
+              canUndo={(history[activeDocId] || []).length > 0}
+              onSave={handleSaveFile}
+              onOpen={handleOpenFile}
+              currentUser={currentUser}
+              currentDoc={activeDoc}
+              onHighlight={handleHighlight}
+              onReplace={handleReplace}
+              onReplaceAll={handleReplaceAll}
+            />
+          </div>
+          
+          {/* פאנל עיצוב - 35% */}
+          <div className="style-panel">
+            <StyleControls
+              currentStyle={currentStyle}
+              onStyleChange={handleStyleChange}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
