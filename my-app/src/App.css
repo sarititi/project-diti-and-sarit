@@ -1,14 +1,548 @@
-/* FileManager.css - ניהול קבצים */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-.file-manager {
+body, html, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  height: 100vh;
+  width: 100vw;
   display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+/* מיכל ראשי - מסך + מקלדת */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  gap: 15px;
+  overflow: hidden;
+}
+
+/* אזור המסך - 50% */
+.screen-area {
+  height: 50%;
+  display: flex;
+  gap: 15px;
+  overflow: hidden;
+}
+
+/* המסמך הפעיל - מרכזי */
+.main-document {
+  flex: 1;
+  background: white;
+  border: 3px solid #333;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* כותרת מסמך */
+.document-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.document-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.close-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.close-btn:hover {
+  background: #d32f2f;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.5);
+}
+
+/* תצוגת תוכן המסמך */
+.document-display {
+  flex: 1;
+  padding: 20px;
+  background: #fafafa;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  line-height: 1.8;
+  direction: rtl;
+  text-align: right;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  font-size: 18px;
+  position: relative;
+}
+
+/* סמן מהבהב */
+.document-display::after {
+  content: '|';
+  display: inline-block;
+  animation: blink 1s infinite;
+  font-weight: 100;
+  font-size: 20px;
+  color: #2c3e50;
+  margin-right: 2px;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.document-display::-webkit-scrollbar {
+  width: 8px;
+}
+
+.document-display::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.document-display::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+.placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* רשימת מסמכים - צד */
+.documents-sidebar {
+  width: 280px;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.sidebar-header h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  text-align: center;
+}
+
+.new-doc-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.new-doc-btn:hover {
+  background: linear-gradient(135deg, #66bb6a 0%, #4CAF50 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.documents-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 5px;
+}
+
+.documents-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.documents-scroll-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.documents-scroll-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+.no-documents {
+  text-align: center;
+  color: #999;
+  padding: 30px 15px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.sidebar-doc {
+  padding: 12px;
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sidebar-doc:hover {
+  border-color: #2196F3;
+  background: white;
+  transform: translateX(-5px);
+  box-shadow: 0 2px 10px rgba(33, 150, 243, 0.2);
+}
+
+.sidebar-doc .document-name {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.sidebar-doc .document-display {
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 60px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.sidebar-doc .document-display::after {
+  display: none;
+}
+
+.sidebar-doc .close-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+}
+
+/* אזור המקלדת - 50% */
+.keyboard-area {
+  height: 50%;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 15px;
+}
+
+/* אנימציית צבעי קשת זוהרים! */
+.keyboard-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    #ff006e 0%,
+    #fb5607 20%,
+    #ffbe0b 40%,
+    #8ac926 60%,
+    #1982c4 80%,
+    #6a4c93 100%
+  );
+  animation: rainbowShift 12s ease-in-out infinite;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+@keyframes rainbowShift {
+  0%, 100% {
+    filter: hue-rotate(0deg) brightness(1.2) saturate(1.3);
+  }
+  50% {
+    filter: hue-rotate(360deg) brightness(1.3) saturate(1.4);
+  }
+}
+
+.keyboard-area > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* מיכל המקלדת הראשי - 65% */
+.keyboard-main {
+  flex: 65;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-/* הכפתורים מוגדרים ב-VirtualKeyboard.css */
+/* פאנל עיצוב בצד - 35% */
+.style-panel {
+  flex: 35;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
+  z-index: 10;
+}
 
-/* Modal רשימת קבצים */
-.file-list-modal {
+.style-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.style-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.style-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.style-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.style-panel h4 {
+  color: white;
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-size: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* מצבי החלה */
+.apply-mode {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.apply-mode h5 {
+  color: white;
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* כפתור החל על כל הטקסט */
+.apply-all-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  margin-top: 8px;
+}
+
+.apply-all-btn:hover {
+  background: linear-gradient(135deg, #66bb6a 0%, #4CAF50 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* בורר צבעים בפאנל */
+.colors-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.colors-section label {
+  display: block;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.panel-color-btn {
+  width: 100%;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.panel-color-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: white;
+}
+
+.panel-color-btn.active {
+  border-color: white;
+  border-width: 4px;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.style-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.style-section label {
+  display: block;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.style-section select {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: white;
+  color: #2c3e50;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.style-section select:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* תצוגה מקדימה */
+.preview-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.preview-section label {
+  display: block;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.preview-box {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* responsive */
+@media (max-width: 1024px) {
+  .screen-area {
+    flex-direction: column;
+    height: 55%;
+  }
+  
+  .documents-sidebar {
+    width: 100%;
+    height: 150px;
+  }
+  
+  .keyboard-area {
+    height: 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .keyboard-area {
+    flex-direction: column;
+  }
+  
+  .keyboard-main,
+  .style-panel {
+    flex: 1;
+  }
+  
+  .screen-area {
+    height: 50%;
+  }
+  
+  .keyboard-area {
+    height: 50%;
+  }
+}
+/* --- הדביקו את הקוד הזה בסוף קובץ ה-CSS הראשי שלכן --- */
+
+/* Modal כללי (מחליף את .file-list-modal) */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -23,14 +557,11 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
+/* תוכן המודאל (זהה ל- .modal-content המקורי) */
 .modal-content {
   background: white;
   border-radius: 20px;
@@ -43,16 +574,11 @@
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
+/* כותרת המודאל (זהה ל- .modal-header המקורי) */
 .modal-header {
   background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
   color: white;
@@ -67,6 +593,7 @@
   font-size: 22px;
 }
 
+/* כפתור סגירה (זהה ל- .close-modal המקורי) */
 .close-modal {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -87,106 +614,21 @@
   transform: rotate(90deg) scale(1.1);
 }
 
+/* אזור הקבצים (זהה ל- .files-container המקורי) */
 .files-container {
   padding: 25px;
   max-height: 450px;
   overflow-y: auto;
 }
 
-.files-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.files-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.files-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-  border-radius: 10px;
-}
-
-.no-files {
-  text-align: center;
-  color: #999;
-  padding: 50px 20px;
-  font-size: 16px;
-  font-style: italic;
-}
-
-.file-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  transition: all 0.3s;
-  background: white;
-}
-
-.file-item:hover {
-  border-color: #4caf50;
-  background: #f1f8e9;
-  transform: translateX(5px);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
-}
-
-.file-name {
-  font-size: 16px;
-  color: #333;
-  font-weight: 600;
-}
-
-.file-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.open-file-btn,
-.delete-file-btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
-  font-size: 14px;
-  color: white;
-}
-
-.open-file-btn {
-  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-}
-
-.open-file-btn:hover {
-  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-}
-
-.delete-file-btn {
-  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-}
-
-.delete-file-btn:hover {
-  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
-}
-
-/* responsive */
-@media (max-width: 768px) {
-  .file-item {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-  
-  .file-actions {
-    width: 100%;
-    justify-content: center;
-  }
-}
+/* סגנונות עיצוב פריטי הקבצים (מ- .file-item וכו') */
+.no-files { text-align: center; color: #999; padding: 50px 20px; font-size: 16px; font-style: italic; }
+.file-item { display: flex; justify-content: space-between; align-items: center; padding: 18px; border: 2px solid #e0e0e0; border-radius: 12px; margin-bottom: 12px; transition: all 0.3s; background: white; }
+.file-item:hover { border-color: #4caf50; background: #f1f8e9; transform: translateX(5px); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2); }
+.file-name { font-size: 16px; color: #333; font-weight: 600; }
+.file-actions { display: flex; gap: 10px; }
+.open-file-btn, .delete-file-btn { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.3s; font-size: 14px; color: white; }
+.open-file-btn { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
+.open-file-btn:hover { background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4); }
+.delete-file-btn { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+.delete-file-btn:hover { background: linear-gradient(135deg, #ef5350 0%, #e53935 100%); transform: scale(1.1); box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4); }

@@ -1,108 +1,120 @@
-import { useState } from 'react';
 import './StyleControls.css';
 
 function StyleControls({ currentStyle, onStyleChange, onApplyToAll }) {
-  const [applyMode, setApplyMode] = useState('new'); // 'new' או 'all'
-  
-  const fonts = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana'];
-  const sizes = [12, 14, 16, 18, 20, 24, 28, 32];
-  const colors = ['#000000', '#FF0000', '#0000FF', '#00FF00', '#FF00FF', '#FFA500', '#800080'];
+  const colors = [
+    '#000000', // שחור
+    '#e74c3c', // אדום
+    '#3498db', // כחול
+    '#2ecc71', // ירוק
+    '#9b59b6', // סגול
+    '#f39c12', // כתום
+    '#1abc9c', // טורקיז
+    '#e91e63'  // ורוד
+  ];
 
-  const handleStyleChange = (newStyle) => {
-    if (applyMode === 'all') {
+  const fonts = ['Arial', 'Tahoma', 'Courier New', 'David', 'Times New Roman', 'Verdana'];
+  const sizes = ['14px', '16px', '18px', '20px', '24px', '28px', '32px'];
+
+  const handleModeChange = (mode) => {
+    if (mode === 'all') {
       // החל על כל הטקסט
-      onApplyToAll(newStyle);
-    } else {
-      // החל רק על תווים חדשים
-      onStyleChange(newStyle);
+      if (onApplyToAll) {
+        onApplyToAll({
+          fontFamily: currentStyle.fontFamily,
+          fontSize: currentStyle.fontSize,
+          color: currentStyle.color
+        });
+      }
     }
+    // עדכן את המצב
+    onStyleChange({ applyMode: mode });
   };
 
   return (
-    <div className="style-controls">
-      <h3>🎨 עיצוב טקסט</h3>
+    <>
+      <h4>⚙️ עיצוב</h4>
       
       {/* בחירת מצב */}
       <div className="apply-mode">
         <label className="mode-option">
           <input 
             type="radio" 
-            name="applyMode" 
-            value="new"
-            checked={applyMode === 'new'}
-            onChange={(e) => setApplyMode(e.target.value)}
+            name="mode" 
+            value="forward"
+            checked={currentStyle.applyMode === 'forward' || !currentStyle.applyMode}
+            onChange={(e) => handleModeChange(e.target.value)}
           />
-          <span>✏️ מכאן והלאה</span>
+          <span>מכאן והלאה</span>
         </label>
         
         <label className="mode-option">
           <input 
             type="radio" 
-            name="applyMode" 
+            name="mode" 
             value="all"
-            checked={applyMode === 'all'}
-            onChange={(e) => setApplyMode(e.target.value)}
+            checked={currentStyle.applyMode === 'all'}
+            onChange={(e) => handleModeChange(e.target.value)}
           />
-          <span>📝 על כל הטקסט</span>
+          <span>החל על כל הטקסט</span>
         </label>
       </div>
-      
-      <div className="controls-row">
-        {/* בחירת גופן */}
-        <div className="control-group">
-          <label>גופן:</label>
-          <select 
-            value={currentStyle.font} 
-            onChange={(e) => handleStyleChange({ font: e.target.value })}
-          >
-            {fonts.map(font => (
-              <option key={font} value={font}>{font}</option>
-            ))}
-          </select>
-        </div>
 
-        {/* בחירת גודל */}
-        <div className="control-group">
-          <label>גודל:</label>
-          <select 
-            value={currentStyle.size} 
-            onChange={(e) => handleStyleChange({ size: Number(e.target.value) })}
-          >
-            {sizes.map(size => (
-              <option key={size} value={size}>{size}px</option>
-            ))}
-          </select>
+      {/* צבעים */}
+      <div className="colors-section">
+        <label>🎨 צבע:</label>
+        <div className="color-grid">
+          {colors.map(color => (
+            <button
+              key={color}
+              className={`panel-color-btn ${currentStyle.color === color ? 'active' : ''}`}
+              style={{ backgroundColor: color }}
+              onClick={() => onStyleChange({ color })}
+              title={color}
+            />
+          ))}
         </div>
+      </div>
 
-        {/* בחירת צבע */}
-        <div className="control-group">
-          <label>צבע:</label>
-          <div className="color-picker">
-            {colors.map(color => (
-              <button
-                key={color}
-                className={`color-btn ${currentStyle.color === color ? 'active' : ''}`}
-                style={{ backgroundColor: color }}
-                onClick={() => handleStyleChange({ color: color })}
-                title={color}
-              />
-            ))}
-          </div>
-        </div>
+      {/* פונט */}
+      <div className="style-section">
+        <label>📝 פונט:</label>
+        <select 
+          value={currentStyle.fontFamily}
+          onChange={(e) => onStyleChange({ fontFamily: e.target.value })}
+        >
+          {fonts.map(font => (
+            <option key={font} value={font}>{font}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* גודל */}
+      <div className="style-section">
+        <label>📏 גודל:</label>
+        <select 
+          value={currentStyle.fontSize}
+          onChange={(e) => onStyleChange({ fontSize: e.target.value })}
+        >
+          {sizes.map(size => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </select>
       </div>
 
       {/* תצוגה מקדימה */}
-      <div className="preview">
-        <span>תצוגה מקדימה: </span>
-        <span style={{
-          fontFamily: currentStyle.font,
-          fontSize: currentStyle.size + 'px',
-          color: currentStyle.color
-        }}>
-          דוגמה ABC 123
-        </span>
+      <div className="preview-section">
+        <label>👁️ תצוגה מקדימה:</label>
+        <div className="preview-box">
+          <span style={{
+            fontFamily: currentStyle.fontFamily,
+            fontSize: currentStyle.fontSize,
+            color: currentStyle.color
+          }}>
+            דוגמה ABC
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

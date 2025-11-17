@@ -1,403 +1,222 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
-import DocumentsContainer from './components/DocumentsContainer';
 import VirtualKeyboard from './components/VirtualKeyboard';
 import StyleControls from './components/StyleControls';
-import ActionButtons from './components/ActionButtons';
-import FileManager from './components/FileManager';
-import SearchReplace from './components/SearchReplace';
-
-// import { useState } from 'react';
-// import './App_FINAL.css';
-// import Header from './components/Header';
-// import DocumentsContainer from './components/DocumentsContainer';
-// import VirtualKeyboard from './components/VirtualKeyboard';
-// import StyleControls from './components/StyleControls';
-// import ActionButtons from './components/ActionButtons';
-// import FileManager from './components/FileManager';
-// import SearchReplace from './components/SearchReplace';
+import SearchReplace from './components/SearchReplace'; // ייבוא רכיב החיפוש
 
 function App() {
-  // ===============================
-  // State ראשי
-  // ===============================
- 
   const [currentUser, setCurrentUser] = useState('user1');
- 
   const [documents, setDocuments] = useState([{
     id: 1,
     name: "מסמך 1",
     content: []
   }]);
- 
   const [activeDocId, setActiveDocId] = useState(1);
-
   const [currentStyle, setCurrentStyle] = useState({
     fontFamily: 'Arial',
     fontSize: '20px',
     color: '#000000',
-    applyMode: 'forward' // 'forward' או 'selected'
+    applyMode: 'forward'
   });
+  const [history, setHistory] = useState({ 1: [] });
 
-  // ⭐ היסטוריה נפרדת לכל מסמך!
-  const [history, setHistory] = useState({
-    1: []  // מסמך 1 מתחיל עם היסטוריה ריקה
-  });
+  // State חדש לניהול המודאלים
+  const [showFileModal, setShowFileModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [savedFiles, setSavedFiles] = useState([]);
 
-  // מציאת המסמך הפעיל
   const activeDoc = documents.find(d => d.id === activeDocId);
-  const otherDocs = documents.filter(d => d.id !== activeDocId);
 
-  // ===============================
-  // פונקציות - ניהול מסמכים
-  // ===============================
+  // טעינת קבצים שמורים כאשר המשתמש משתנה
+  useEffect(() => {
+    loadSavedFiles();
+  }, [currentUser]);
 
-  // יצירת מסמך חדש
+  const loadSavedFiles = () => {
+    const allKeys = Object.keys(localStorage);
+    const userFiles = allKeys
+      .filter(key => key.startsWith(`${currentUser}_`))
+      .map(key => key.replace(`${currentUser}_`, ''));
+    setSavedFiles(userFiles);
+  };
+
   const handleNewDoc = () => {
-    const newId = Math.max(...documents.map(d => d.id)) + 1;
-    const newDoc = {
-      id: newId,
-      name: `מסמך ${newId}`,
-      content: []
-    };
+    const newId = documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1;
+    const newDoc = { id: newId, name: `מסמך ${newId}`, content: [] };
     setDocuments([...documents, newDoc]);
     setActiveDocId(newId);
-   
-    // ⭐ יצירת היסטוריה ריקה למסמך החדש
-    setHistory(prev => ({
-      ...prev,
-      [newId]: []
-    }));
+    setHistory(prev => ({ ...prev, [newId]: [] }));
   };
 
-  // סגירת מסמך
-  const handleCloseDoc = (id) => {
+// בתוך App.jsx, החלף את handleCloseDoc בגרסה זו:
+const handleCloseDoc = (id) => {
     if (documents.length === 1) {
-      alert('⚠️ לא ניתן לסגור את המסמך האחרון!');
-      return;
+        alert('⚠️ לא ניתן לסגור את המסמך האחרון!');
+        return;
     }
 
-    if (window.confirm('לסגור את המסמך? (שמור אותו לפני!)')) {
-      setDocuments(docs => docs.filter(d => d.id !== id));
-     
-      // אם סגרנו את המסמך הפעיל, עבור למסמך הראשון
-      if (id === activeDocId) {
+    // כאן הוספנו את ההצעה לשמירה
+    if (window.confirm(`לסגור את המסמך "${documents.find(d => d.id === id).name}"?`)) {
+        // אם המשתמש רוצה לסגור, נמשיך עם הלוגיקה הקיימת
         const remainingDocs = documents.filter(d => d.id !== id);
-        setActiveDocId(remainingDocs[0].id);
-      }
-     
-      // ⭐ מחיקת היסטוריה של המסמך שנסגר
-      setHistory(prev => {
-        const newHistory = { ...prev };
-        delete newHistory[id];
-        return newHistory;
-      });
+        setDocuments(remainingDocs);
+        if (id === activeDocId) {
+            setActiveDocId(remainingDocs[0].id);
+        }
+        setHistory(prev => {
+            const newHistory = { ...prev };
+            delete newHistory[id];
+            return newHistory;
+        });
+    }
+};
+
+  const handleSwitchDoc = (id) => setActiveDocId(id);
+
+  const updateActiveDocContent = (newContent) => {
+    setDocuments(prevDocs => {
+      setHistory(h => ({ ...h, [activeDocId]: [...(h[activeDocId] || []), prevDocs] }));
+      return prevDocs.map(doc =>
+        doc.id === activeDocId ? { ...doc, content: newContent } : doc
+      );
+    });
+  };
+
+  const handleCharacterClick = (char) => {
+    const newCharObject = {
+      char: char,
+      fontFamily: currentStyle.fontFamily,
+      fontSize: currentStyle.fontSize,
+      color: currentStyle.color
+    };
+    updateActiveDocContent([...activeDoc.content, newCharObject]);
+  };
+
+  const handleStyleChange = (newStyle) => {
+    const updatedStyle = { ...currentStyle, ...newStyle };
+    setCurrentStyle(updatedStyle);
+    if (updatedStyle.applyMode === 'all') {
+      handleApplyStyleToAll(updatedStyle);
     }
   };
 
-  // מעבר בין מסמכים
-  const handleSwitchDoc = (id) => {
-    setActiveDocId(id);
-    // ⭐ לא מוחקים כלום! כל מסמך שומר את ההיסטוריה שלו
+  const handleApplyStyleToAll = (styleToApply) => {
+    const newContent = activeDoc.content.map(charObj => ({
+      ...charObj,
+      fontFamily: styleToApply.fontFamily || charObj.fontFamily,
+      fontSize: styleToApply.fontSize || charObj.fontSize,
+      color: styleToApply.color || charObj.color,
+    }));
+    updateActiveDocContent(newContent);
   };
 
-  // ===============================
-  // פונקציות - מקלדת
-  // ===============================
- 
-  const handleCharacterClick = (char) => {
-    setDocuments(prev => {
-      // ⭐ שמור את המצב הנוכחי להיסטוריה של המסמך הפעיל
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId) {
-          return {
-            ...doc,
-            content: [
-              ...doc.content,
-              {
-                char: char,
-                fontFamily: currentStyle.fontFamily,
-                fontSize: currentStyle.fontSize,
-                color: currentStyle.color
-              }
-            ]
-          };
-        }
-        return doc;
-      });
-    });
-  };
-
-  // ===============================
-  // פונקציות - עיצוב
-  // ===============================
- 
-  // שינוי סטייל (כולל מצב החלה)
-  const handleStyleChange = (newStyle) => {
-    setCurrentStyle(prev => ({ ...prev, ...newStyle }));
-    
-    // אם במצב "לקטע מסומן" ויש טקסט מסומן - החל על המסומן
-    // (זה ידרש הוספת selection state בעתיד)
-  };
-
-  // החלת סטייל על כל הטקסט הקיים
-  const handleApplyStyleToAll = (newStyle) => {
-    setDocuments(prev => {
-      // ⭐ שמור להיסטוריה של המסמך הפעיל
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId) {
-          return {
-            ...doc,
-            content: doc.content.map(charObj => ({
-              ...charObj,
-              fontFamily: newStyle.fontFamily || charObj.fontFamily,
-              fontSize: newStyle.fontSize || charObj.fontSize,
-              color: newStyle.color || charObj.color
-            }))
-          };
-        }
-        return doc;
-      });
-    });
-   
-    setCurrentStyle(prev => ({ ...prev, ...newStyle }));
-  };
-
-  // ===============================
-  // פונקציות - משתמש
-  // ===============================
- 
   const handleUserChange = (newUser) => {
     setCurrentUser(newUser);
-    setDocuments([{
-      id: 1,
-      name: "מסמך 1",
-      content: []
-    }]);
+    setDocuments([{ id: 1, name: "מסמך 1", content: [] }]);
     setActiveDocId(1);
-    // ⭐ איפוס כל ההיסטוריה
     setHistory({ 1: [] });
   };
 
-  // ===============================
-  // פונקציות - פעולות מחיקה
-  // ===============================
- 
-  // מחיקת תו אחרון
   const handleDeleteChar = () => {
-    setDocuments(prev => {
-      // ⭐ שמור להיסטוריה של המסמך הפעיל
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId && doc.content.length > 0) {
-          return {
-            ...doc,
-            content: doc.content.slice(0, -1)
-          };
-        }
-        return doc;
-      });
-    });
-  };
-
-  // מחיקת מילה אחרונה
-  const handleDeleteWord = () => {
-    setDocuments(prev => {
-      // ⭐ שמור להיסטוריה של המסמך הפעיל
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId) {
-          let content = [...doc.content];
-         
-          while (content.length > 0 && content[content.length - 1].char === ' ') {
-            content.pop();
-          }
-         
-          while (content.length > 0 && content[content.length - 1].char !== ' ') {
-            content.pop();
-          }
-         
-          return { ...doc, content };
-        }
-        return doc;
-      });
-    });
-  };
-
-  // מחיקת כל הטקסט
-  const handleDeleteAll = () => {
-    if (window.confirm('למחוק את כל הטקסט?')) {
-      setDocuments(prev => {
-        // ⭐ שמור להיסטוריה של המסמך הפעיל
-        setHistory(h => ({
-          ...h,
-          [activeDocId]: [...(h[activeDocId] || []), prev]
-        }));
-       
-        return prev.map(doc => {
-          if (doc.id === activeDocId) {
-            return { ...doc, content: [] };
-          }
-          return doc;
-        });
-      });
+    if (activeDoc.content.length > 0) {
+      updateActiveDocContent(activeDoc.content.slice(0, -1));
     }
   };
 
-  // Undo - ביטול פעולה אחרונה
+  const handleDeleteWord = () => {
+    let contentStr = activeDoc.content.map(c => c.char).join('');
+    let lastSpaceIndex = contentStr.trimEnd().lastIndexOf(' ');
+    const newContent = lastSpaceIndex === -1 ? [] : activeDoc.content.slice(0, lastSpaceIndex + 1);
+    updateActiveDocContent(newContent);
+  };
+  
+  const handleDeleteAll = () => {
+    if (window.confirm('למחוק את כל הטקסט?')) {
+      updateActiveDocContent([]);
+    }
+  };
+
   const handleUndo = () => {
     const docHistory = history[activeDocId] || [];
-   
     if (docHistory.length > 0) {
       const lastState = docHistory[docHistory.length - 1];
       setDocuments(lastState);
-     
-      // ⭐ הסר רק מההיסטוריה של המסמך הפעיל
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: docHistory.slice(0, -1)
-      }));
+      setHistory(h => ({ ...h, [activeDocId]: docHistory.slice(0, -1) }));
     }
   };
 
-  // ===============================
-  // פונקציות - חיפוש והחלפה
-  // ===============================
- 
-  // הדגשת תו (אופציונלי - אם רוצה אפקט ויזואלי)
-  const handleHighlight = (index) => {
-    console.log(`מדגיש תו במיקום ${index}`);
-    // אפשר להוסיף אפקט ויזואלי בעתיד
-  };
-
-  // החלפת תו בודד
   const handleReplace = (index, newChar) => {
-    setDocuments(prev => {
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId) {
-          const newContent = [...doc.content];
-          newContent[index] = {
-            ...newContent[index],
-            char: newChar
-          };
-          return { ...doc, content: newContent };
-        }
-        return doc;
-      });
-    });
+    const newContent = [...activeDoc.content];
+    newContent[index] = { ...newContent[index], char: newChar };
+    updateActiveDocContent(newContent);
   };
 
-  // החלפת כל המופעים
   const handleReplaceAll = (searchChar, replaceChar) => {
-    setDocuments(prev => {
-      setHistory(h => ({
-        ...h,
-        [activeDocId]: [...(h[activeDocId] || []), prev]
-      }));
-     
-      return prev.map(doc => {
-        if (doc.id === activeDocId) {
-          const newContent = doc.content.map(charObj =>
-            charObj.char === searchChar
-              ? { ...charObj, char: replaceChar }
-              : charObj
-          );
-          return { ...doc, content: newContent };
-        }
-        return doc;
-      });
-    });
+    const newContent = activeDoc.content.map(charObj =>
+      charObj.char === searchChar ? { ...charObj, char: replaceChar } : charObj
+    );
+    updateActiveDocContent(newContent);
   };
 
-  // ===============================
-  // פונקציות - ניהול קבצים
-  // ===============================
- 
-  const handleSaveFile = (fileName) => {
-    console.log(`נשמר: ${fileName}`);
+  const handleSaveFile = () => {
+    if (!activeDoc || activeDoc.content.length === 0) {
+      alert('⚠️ המסמך ריק! אין מה לשמור.');
+      return;
+    }
+    const fileName = prompt('📝 שם הקובץ:', activeDoc.name);
+    if (fileName && fileName.trim()) {
+      const docToSave = { ...activeDoc, name: fileName.trim() };
+      const key = `${currentUser}_${fileName.trim()}`;
+      localStorage.setItem(key, JSON.stringify(docToSave));
+      alert(`✅ נשמר בהצלחה: ${fileName}`);
+      setDocuments(docs => docs.map(d => d.id === activeDocId ? { ...d, name: fileName.trim() } : d));
+      loadSavedFiles();
+    }
   };
 
-  const handleOpenFile = (loadedDoc) => {
-    const newId = Math.max(...documents.map(d => d.id)) + 1;
-    const newDoc = {
-      ...loadedDoc,
-      id: newId
-    };
-    setDocuments([...documents, newDoc]);
-    setActiveDocId(newId);
-   
-    // ⭐ יצירת היסטוריה ריקה למסמך הנפתח
-    setHistory(prev => ({
-      ...prev,
-      [newId]: []
-    }));
+  const handleOpenFile = (fileName) => {
+    const key = `${currentUser}_${fileName}`;
+    const data = localStorage.getItem(key);
+    if (data) {
+      const loadedDoc = JSON.parse(data);
+      const newId = documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1;
+      const newDoc = { ...loadedDoc, id: newId };
+      setDocuments([...documents, newDoc]);
+      setActiveDocId(newId);
+      setHistory(prev => ({ ...prev, [newId]: [] }));
+      setShowFileModal(false);
+    }
+  };
+    
+  const handleDeleteFile = (fileName) => {
+      if (window.confirm(`למחוק את הקובץ "${fileName}"?`)) {
+          const key = `${currentUser}_${fileName}`;
+          localStorage.removeItem(key);
+          loadSavedFiles(); // רענון הרשימה
+      }
   };
 
-  // ===============================
-  // תצוגה - מבנה חדש!
-  // ===============================
- 
+
   return (
     <div className="app">
-      <Header
-        currentUser={currentUser}
-        onUserChange={handleUserChange}
-      />
-     
+      <Header currentUser={currentUser} onUserChange={handleUserChange} />
+      
       <div className="main-container">
-        {/* אזור המסך - 60% */}
         <div className="screen-area">
-          {/* מסמך פעיל גדול */}
           <div className="main-document">
             {activeDoc && (
               <>
                 <div className="document-header">
-                  <div className="document-name">{activeDoc.name}</div>
-                  <button 
-                    className="close-btn"
-                    onClick={() => handleCloseDoc(activeDoc.id)}
-                  >
-                    ×
-                  </button>
+                  <span className="document-name">{activeDoc.name}</span>
+                  <button className="close-btn" onClick={() => handleCloseDoc(activeDoc.id)}>×</button>
                 </div>
                 <div className="document-display">
                   {activeDoc.content.length === 0 ? (
-                    <span className="placeholder">התחילי לכתוב...</span>
+                    <span className="placeholder">התחל לכתוב...</span>
                   ) : (
                     activeDoc.content.map((charObj, index) => (
-                      <span
-                        key={index}
-                        style={{
-                          fontFamily: charObj.fontFamily,
-                          fontSize: charObj.fontSize,
-                          color: charObj.color
-                        }}
-                      >
+                      <span key={index} style={{ fontFamily: charObj.fontFamily, fontSize: charObj.fontSize, color: charObj.color }}>
                         {charObj.char}
                       </span>
                     ))
@@ -407,66 +226,31 @@ function App() {
             )}
           </div>
           
-          {/* רשימת מסמכים בצד */}
           <div className="documents-sidebar">
             <div className="sidebar-header">
-              <h3>המסמכים שלי</h3>
-              <button className="new-doc-btn" onClick={handleNewDoc}>
-                + מסמך חדש
-              </button>
+              <h3>📄 המסמכים שלי</h3>
+              <button className="new-doc-btn" onClick={handleNewDoc}>➕ מסמך חדש</button>
             </div>
-            
+             <div className="sidebar-file-actions">
+                <button className="sidebar-btn" onClick={handleSaveFile}>💾 שמור</button>
+                <button className="sidebar-btn" onClick={() => { loadSavedFiles(); setShowFileModal(true); }}>📂 פתח</button>
+            </div>
             <div className="documents-scroll-list">
-              {otherDocs.length === 0 ? (
-                <div className="no-documents">אין מסמכים נוספים</div>
-              ) : (
-                otherDocs.map(doc => (
-                  <div
-                    key={doc.id}
-                    className="sidebar-doc"
-                    onClick={() => handleSwitchDoc(doc.id)}
-                  >
-                    <div className="document-header">
-                      <div className="document-name">{doc.name}</div>
-                      <button 
-                        className="close-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCloseDoc(doc.id);
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <div className="document-display">
-                      {doc.content.length === 0 ? (
-                        <span className="placeholder">ריק</span>
-                      ) : (
-                        doc.content.slice(0, 20).map((charObj, i) => (
-                          <span
-                            key={i}
-                            style={{
-                              fontFamily: charObj.fontFamily,
-                              fontSize: charObj.fontSize,
-                              color: charObj.color
-                            }}
-                          >
-                            {charObj.char}
-                          </span>
-                        ))
-                      )}
-                      {doc.content.length > 20 && '...'}
-                    </div>
-                  </div>
-                ))
-              )}
+              {documents.map(doc => (
+                <div
+                  key={doc.id}
+                  className={`sidebar-doc ${doc.id === activeDocId ? 'active' : ''}`}
+                  onClick={() => handleSwitchDoc(doc.id)}
+                >
+                  <span className="doc-name-side">{doc.name}</span>
+                  <button className="close-btn-small" onClick={(e) => { e.stopPropagation(); handleCloseDoc(doc.id); }}>×</button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
         
-        {/* אזור המקלדת - 40% */}
         <div className="keyboard-area">
-          {/* מקלדת ראשית - 65% */}
           <div className="keyboard-main">
             <VirtualKeyboard
               onCharacterClick={handleCharacterClick}
@@ -475,25 +259,51 @@ function App() {
               onDeleteAll={handleDeleteAll}
               onUndo={handleUndo}
               canUndo={(history[activeDocId] || []).length > 0}
-              onSave={handleSaveFile}
-              onOpen={handleOpenFile}
-              currentUser={currentUser}
-              currentDoc={activeDoc}
-              onHighlight={handleHighlight}
-              onReplace={handleReplace}
-              onReplaceAll={handleReplaceAll}
+              onToggleSearch={() => setShowSearchModal(true)}
             />
           </div>
-          
-          {/* פאנל עיצוב - 35% */}
           <div className="style-panel">
-            <StyleControls
-              currentStyle={currentStyle}
-              onStyleChange={handleStyleChange}
-            />
+            <StyleControls currentStyle={currentStyle} onStyleChange={handleStyleChange} onApplyToAll={handleApplyStyleToAll}/>
           </div>
         </div>
       </div>
+
+      {/* Modal רשימת קבצים */}
+      {showFileModal && (
+        <div className="modal-overlay" onClick={() => setShowFileModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h4>📂 הקבצים שלי</h4>
+              <button className="close-modal" onClick={() => setShowFileModal(false)}>×</button>
+            </div>
+            <div className="files-container">
+              {savedFiles.length === 0 ? (
+                <p className="no-files">אין קבצים שמורים</p>
+              ) : (
+                savedFiles.map(fileName => (
+                  <div key={fileName} className="file-item">
+                    <span className="file-name">📄 {fileName}</span>
+                    <div className="file-actions">
+                      <button className="open-file-btn" onClick={() => handleOpenFile(fileName)}>פתח</button>
+                      <button className="delete-file-btn" onClick={() => handleDeleteFile(fileName)}>🗑️</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal חיפוש והחלפה */}
+      {showSearchModal && (
+          <SearchReplace
+            currentDoc={activeDoc}
+            onReplace={handleReplace}
+            onReplaceAll={handleReplaceAll}
+            onClose={() => setShowSearchModal(false)}
+          />
+      )}
     </div>
   );
 }

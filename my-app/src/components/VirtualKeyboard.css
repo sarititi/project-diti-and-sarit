@@ -1,172 +1,135 @@
-/* VirtualKeyboard.css - מקלדת מרהיבה */
+/* VirtualKeyboard.css - מקלדת מושלמת */
 
 .virtual-keyboard {
   display: flex;
-  flex-direction: column;
   gap: 10px;
   height: 100%;
 }
 
-/* שורת כפתורים עליונה */
-.keyboard-top-row {
+/* פאנל כפתורי פעולה - משמאל */
+.actions-panel {
   display: flex;
-  justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
 }
 
-/* כפתורים אחידים */
-.keyboard-btn {
-  padding: 10px 16px;
-  background: white;
-  border: 2px solid rgba(0, 0, 0, 0.1);
+.actions-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 55px;
+  height: 55px;
+  border: none;
   border-radius: 10px;
-  font-size: 13px;
-  font-weight: bold;
+  font-size: 24px;
   cursor: pointer;
-  transition: all 0.2s;
-  color: #2c3e50;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.keyboard-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.action-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-.keyboard-btn:active {
-  transform: translateY(-1px);
+.action-btn:active {
+  transform: translateY(0) scale(1);
 }
 
-.keyboard-btn:disabled {
+.action-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* בורר שפה */
-.language-selector {
-  position: relative;
+/* צבעים לכפתורי פעולה */
+.language-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
-.current-language-btn {
-  background: white;
-  min-width: 130px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: space-between;
+.language-btn:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
-.language-icon {
-  font-size: 20px;
-}
-
-.language-name {
-  flex: 1;
-  text-align: center;
-}
-
-.dropdown-arrow {
-  font-size: 10px;
-}
-
-/* תפריט שפות */
-.language-menu {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  background: white;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  z-index: 100;
-  min-width: 160px;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.language-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px 15px;
-  background: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: right;
-  font-size: 14px;
-  color: #2c3e50;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.language-option:last-child {
-  border-bottom: none;
-}
-
-.language-option:hover {
-  background: #f8f9fa;
-}
-
-.language-option.active {
-  background: #e3f2fd;
+.delete-char-btn {
+  background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
+  color: #e65100;
   font-weight: bold;
 }
 
-.check-mark {
-  margin-right: auto;
-  color: #4CAF50;
-  font-size: 16px;
+.delete-char-btn:hover {
+  background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
 }
 
-/* כפתורי פעולה - צבעים יפים */
-.delete-char {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-  color: #e65100;
-}
-
-.delete-word {
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  color: #c62828;
-}
-
-.undo {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  color: #1565c0;
-}
-
-.delete-all {
-  background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
+.delete-word-btn {
+  background: linear-gradient(135deg, #ef9a9a 0%, #e57373 100%);
   color: #b71c1c;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.delete-word-btn:hover {
+  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+}
+
+.delete-all-btn {
+  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+  color: white;
+  font-weight: bold;
+}
+
+.delete-all-btn:hover {
+  background: linear-gradient(135deg, #ef5350 0%, #f44336 100%);
+}
+
+.undo-btn {
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  color: #0d47a1;
+  font-weight: bold;
+}
+
+.undo-btn:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  color: #2e7d32;
+  background: linear-gradient(135deg, #a5d6a7 0%, #81c784 100%);
+  color: #1b5e20;
+  font-weight: bold;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
 }
 
 .open-btn {
-  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+  background: linear-gradient(135deg, #81d4fa 0%, #4fc3f7 100%);
   color: #01579b;
+  font-weight: bold;
+}
+
+.open-btn:hover {
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+  background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
   color: #4a148c;
+  font-weight: bold;
+}
+
+.search-btn:hover {
+  background: linear-gradient(135deg, #ba68c8 0%, #ab47bc 100%);
 }
 
 /* שורות המקלדת */
@@ -181,6 +144,7 @@
   border: 3px solid #2c3e50;
   border-radius: 15px;
   backdrop-filter: blur(5px);
+  overflow-y: auto;
 }
 
 .keyboard-row {
@@ -191,13 +155,13 @@
 
 /* מקשי מקלדת */
 .key-button {
-  min-width: 45px;
-  height: 45px;
+  min-width: 55px;
+  height: 55px;
   padding: 10px;
   background: white;
   border: none;
   border-radius: 8px;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
@@ -240,8 +204,225 @@
   transform: scale(1.15) translateY(-2px);
 }
 
+/* תפריט שפות */
+.language-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.language-menu {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  min-width: 200px;
+  animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 20px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: right;
+  font-size: 15px;
+  color: #2c3e50;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.language-option:last-child {
+  border-bottom: none;
+}
+
+.language-option:hover {
+  background: #f8f9fa;
+}
+
+.language-option.active {
+  background: #e3f2fd;
+  font-weight: bold;
+}
+
+.language-icon {
+  font-size: 22px;
+}
+
+.language-name {
+  flex: 1;
+}
+
+.check-mark {
+  color: #4CAF50;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Modal קבצים */
+.file-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.file-modal {
+  background: white;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 70vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-modal {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.files-list {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-files {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.file-item:hover {
+  border-color: #4CAF50;
+  background: #f1f8e9;
+  transform: translateX(5px);
+}
+
+.file-name {
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.file-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.open-file-btn,
+.delete-file-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.open-file-btn {
+  background: #4CAF50;
+  color: white;
+}
+
+.open-file-btn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.delete-file-btn {
+  background: #f44336;
+  color: white;
+}
+
+.delete-file-btn:hover {
+  background: #d32f2f;
+  transform: scale(1.1);
+}
+
 /* responsive */
 @media (max-width: 1024px) {
+  .action-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
   .key-button {
     min-width: 40px;
     height: 40px;
@@ -254,13 +435,14 @@
 }
 
 @media (max-width: 768px) {
-  .keyboard-top-row {
-    gap: 6px;
+  .actions-panel {
+    flex-direction: row;
   }
   
-  .keyboard-btn {
-    padding: 8px 12px;
-    font-size: 12px;
+  .action-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
   }
   
   .key-button {

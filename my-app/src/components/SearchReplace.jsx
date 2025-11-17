@@ -1,111 +1,54 @@
-
-// src/components/SearchReplace.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './SearchReplace.css';
 
-function SearchReplace({ currentDoc, onHighlight, onReplace, onReplaceAll }) {
+function SearchReplace({ currentDoc, onReplace, onReplaceAll, onClose }) {
   const [searchChar, setSearchChar] = useState('');
   const [replaceChar, setReplaceChar] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [currentResultIndex, setCurrentResultIndex] = useState(-1);
 
-  // חיפוש תו
+  // אפקט שמאפס את החיפוש אם המסמך משתנה
+  useEffect(() => {
+    handleClear();
+  }, [currentDoc]);
+
   const handleSearch = () => {
-    if (!searchChar) {
-      alert('⚠️ נא להזין תו לחיפוש');
-      return;
-    }
-
-    const results = [];
-    currentDoc.content.forEach((char, index) => {
-      if (char.text === searchChar) {
-        results.push(index);
-      }
-    });
-
+    if (!searchChar) return;
+    const results = currentDoc.content.reduce((acc, charObj, index) => {
+      if (charObj.char === searchChar) acc.push(index);
+      return acc;
+    }, []);
+    
     setSearchResults(results);
-   
-    if (results.length === 0) {
-      alert(`❌ לא נמצא "${searchChar}"`);
-      setCurrentResultIndex(-1);
-    } else {
+    if (results.length > 0) {
       setCurrentResultIndex(0);
-      onHighlight(results[0]);
-      alert(`✅ נמצאו ${results.length} תוצאות`);
-    }
-  };
-
-  // המשך לתוצאה הבאה
-  const handleNext = () => {
-    if (searchResults.length === 0) return;
-   
-    const nextIndex = (currentResultIndex + 1) % searchResults.length;
-    setCurrentResultIndex(nextIndex);
-    onHighlight(searchResults[nextIndex]);
-  };
-
-  // חזור לתוצאה הקודמת
-  const handlePrev = () => {
-    if (searchResults.length === 0) return;
-   
-    const prevIndex = currentResultIndex === 0
-      ? searchResults.length - 1
-      : currentResultIndex - 1;
-    setCurrentResultIndex(prevIndex);
-    onHighlight(searchResults[prevIndex]);
-  };
-
-  // החלפת תו בודד
-  const handleReplaceCurrent = () => {
-    if (!replaceChar) {
-      alert('⚠️ נא להזין תו להחלפה');
-      return;
-    }
-   
-    if (currentResultIndex === -1 || searchResults.length === 0) {
-      alert('⚠️ חפש תחילה!');
-      return;
-    }
-
-    onReplace(searchResults[currentResultIndex], replaceChar);
-   
-    // מצא את התוצאה הבאה
-    const newResults = searchResults.filter((_, i) => i !== currentResultIndex);
-    setSearchResults(newResults);
-   
-    if (newResults.length === 0) {
-      alert('✅ הושלמה ההחלפה!');
-      setCurrentResultIndex(-1);
     } else {
-      const nextIndex = currentResultIndex >= newResults.length
-        ? 0
-        : currentResultIndex;
-      setCurrentResultIndex(nextIndex);
-      onHighlight(newResults[nextIndex]);
-    }
-  };
-
-  // החלפת כל המופעים
-  const handleReplaceAllChars = () => {
-    if (!searchChar || !replaceChar) {
-      alert('⚠️ נא למלא שני השדות');
-      return;
-    }
-
-    if (searchResults.length === 0) {
-      alert('⚠️ חפש תחילה!');
-      return;
-    }
-
-    if (window.confirm(`להחליף את כל ${searchResults.length} המופעים של "${searchChar}" ב-"${replaceChar}"?`)) {
-      onReplaceAll(searchChar, replaceChar);
-      setSearchResults([]);
       setCurrentResultIndex(-1);
-      alert(`✅ הוחלפו ${searchResults.length} תווים!`);
+      alert(`לא נמצאו מופעים של "${searchChar}".`);
     }
   };
 
-  // איפוס
+  const navigateResults = (direction) => {
+    if (searchResults.length === 0) return;
+    const newIndex = (currentResultIndex + direction + searchResults.length) % searchResults.length;
+    setCurrentResultIndex(newIndex);
+  };
+
+  const handleReplaceCurrent = () => {
+    if (currentResultIndex === -1 || !replaceChar) return;
+    onReplace(searchResults[currentResultIndex], replaceChar);
+    
+    // לאחר ההחלפה, נבצע חיפוש מחדש כדי לעדכן את האינדקסים
+    // זו הדרך הבטוחה ביותר להתמודד עם שינויים בתוכן
+    setTimeout(handleSearch, 50); 
+  };
+
+  const handleReplaceAllChars = () => {
+    if (searchResults.length === 0 || !replaceChar) return;
+    onReplaceAll(searchChar, replaceChar);
+    onClose(); // סגירת החלון לאחר החלפה מלאה
+  };
+
   const handleClear = () => {
     setSearchChar('');
     setReplaceChar('');
@@ -114,74 +57,57 @@ function SearchReplace({ currentDoc, onHighlight, onReplace, onReplaceAll }) {
   };
 
   return (
-    <div className="search-replace">
-      <h3>🔍 חיפוש והחלפה</h3>
-     
-      <div className="search-replace-content">
-        {/* שדה חיפוש */}
-        <div className="input-group">
-          <label>חפש תו:</label>
-          <input
-            type="text"
-            maxLength="1"
-            value={searchChar}
-            onChange={(e) => setSearchChar(e.target.value)}
-            placeholder="הזן תו אחד"
-            className="char-input"
-          />
-          <button onClick={handleSearch} className="btn-search">
-            🔍 חפש
-          </button>
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div className="search-replace-modal">
+        <div className="search-replace-header">
+          <h3>🔍 חיפוש והחלפה</h3>
+          <button className="close-search-btn" onClick={onClose}>×</button>
         </div>
-
-        {/* תוצאות חיפוש */}
-        {searchResults.length > 0 && (
-          <div className="search-info">
-            <span className="result-count">
-              תוצאה {currentResultIndex + 1} מתוך {searchResults.length}
-            </span>
-            <div className="navigation-btns">
-              <button onClick={handlePrev} className="btn-nav">◀ קודם</button>
-              <button onClick={handleNext} className="btn-nav">הבא ▶</button>
-            </div>
+        <div className="search-replace-body">
+          <div className="input-group">
+            <input
+              type="text"
+              maxLength="1"
+              value={searchChar}
+              onChange={(e) => setSearchChar(e.target.value)}
+              placeholder="חפש תו..."
+              className="char-input"
+            />
+            <button onClick={handleSearch} className="btn-search">חפש</button>
           </div>
-        )}
 
-        {/* שדה החלפה */}
-        <div className="input-group">
-          <label>החלף ב:</label>
-          <input
-            type="text"
-            maxLength="1"
-            value={replaceChar}
-            onChange={(e) => setReplaceChar(e.target.value)}
-            placeholder="הזן תו אחד"
-            className="char-input"
-          />
-        </div>
+          {searchResults.length > 0 && (
+            <div className="search-info">
+              <span className="result-count">
+                נמצאו {searchResults.length} תוצאות (נוכחית: {currentResultIndex + 1})
+              </span>
+              <div className="navigation-btns">
+                <button onClick={() => navigateResults(-1)} className="btn-nav">◀ קודם</button>
+                <button onClick={() => navigateResults(1)} className="btn-nav">הבא ▶</button>
+              </div>
+            </div>
+          )}
 
-        {/* כפתורי פעולה */}
-        <div className="action-btns">
-          <button
-            onClick={handleReplaceCurrent}
-            className="btn-replace"
-            disabled={searchResults.length === 0}
-          >
-            🔄 החלף נוכחי
-          </button>
-          <button
-            onClick={handleReplaceAllChars}
-            className="btn-replace-all"
-            disabled={searchResults.length === 0}
-          >
-            🔄 החלף הכל
-          </button>
-          <button onClick={handleClear} className="btn-clear">
-            ✕ נקה
-          </button>
+          <div className="input-group">
+            <input
+              type="text"
+              maxLength="1"
+              value={replaceChar}
+              onChange={(e) => setReplaceChar(e.target.value)}
+              placeholder="החלף בתו..."
+              className="char-input"
+            />
+          </div>
+
+          <div className="action-btns">
+            <button onClick={handleReplaceCurrent} className="btn-replace" disabled={searchResults.length === 0}>החלף נוכחי</button>
+            <button onClick={handleReplaceAllChars} className="btn-replace-all" disabled={searchResults.length === 0}>החלף הכל</button>
+            <button onClick={handleClear} className="btn-clear">נקה</button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

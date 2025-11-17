@@ -1,4 +1,4 @@
-/* Document.css - מסמכים */
+/* Document.css - מסמכים עם סמן */
 
 /* כותרת מסמך */
 .document-header {
@@ -52,6 +52,32 @@
   white-space: pre-wrap;
   overflow-y: auto;
   font-size: 18px;
+  position: relative;
+}
+
+/* סמן מהבהב */
+.document-display::after {
+  content: '|';
+  display: inline-block;
+  animation: blink 1s infinite;
+  font-weight: 100;
+  font-size: 20px;
+  color: #2c3e50;
+  margin-right: 2px;
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* כשיש טקסט - הסמן אחרי הטקסט */
+.document-display:not(:empty)::after {
+  position: static;
 }
 
 .document-display::-webkit-scrollbar {
@@ -71,6 +97,11 @@
 .placeholder {
   color: #999;
   font-style: italic;
+}
+
+/* הסתרת הסמן כשיש placeholder */
+.document-display .placeholder + ::after {
+  display: none;
 }
 
 /* מסמכים ברשימה */
@@ -109,6 +140,11 @@
   overflow: hidden;
   background: white;
   border: 1px solid #e0e0e0;
+}
+
+/* הסמן לא מופיע במסמכים ברשימה */
+.sidebar-doc .document-display::after {
+  display: none;
 }
 
 .sidebar-doc .close-btn {

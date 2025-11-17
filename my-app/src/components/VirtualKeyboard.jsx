@@ -1,8 +1,16 @@
-
 import { useState } from 'react';
 import './VirtualKeyboard.css';
 
-function VirtualKeyboard({ onCharacterClick }) {
+// הרכיב כבר לא צריך את כל הלוגיקה של הקבצים
+function VirtualKeyboard({ 
+  onCharacterClick,
+  onDeleteChar,
+  onDeleteWord,
+  onDeleteAll,
+  onUndo,
+  canUndo,
+  onToggleSearch // Prop חדש לפתיחת מודאל החיפוש
+}) {
   const [currentKeyboard, setCurrentKeyboard] = useState('hebrew');
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
@@ -26,42 +34,18 @@ function VirtualKeyboard({ onCharacterClick }) {
       ['Space']
     ],
     emoji: [
-      ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃'],
-      ['😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙'],
-      ['😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔'],
-      ['🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥'],
-      ['😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮'],
-      ['🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'],
-      ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔'],
-      ['💯', '💢', '💥', '💫', '💦', '💨', '🕳️', '💬', '👁️', '🗨️'],
-      ['👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘'],
-      ['👌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️'],
+      ['😀', '❤️', '👍', '😂', '😍', '🤔', '🎉', '🔥', '🙏', '💯'],
+      ['😊', '😭', '😡', '😱', '😴', '😎', '🤢', '🤯', '🥳', '🥺'],
+      ['👋', '👌', '✌️', '🤞', '🤟', '🤙', '👀', '🧠', '👑', '🚀'],
       ['Space']
     ]
   };
 
-  const languageIcons = {
-    hebrew: '🇮🇱',
-    english: '🇺🇸',
-    numbers: '🔢',
-    emoji: '😀'
-  };
-
-  const languageNames = {
-    hebrew: 'עברית',
-    english: 'English',
-    numbers: 'מספרים',
-    emoji: 'אימוג׳ים'
-  };
-
-  const keysToShow = keyboards[currentKeyboard];
+  const languageIcons = { hebrew: '🇮🇱', english: '🇺🇸', numbers: '🔢', emoji: '😀' };
+  const languageNames = { hebrew: 'עברית', english: 'English', numbers: 'מספרים', emoji: 'אימוג׳ים' };
 
   const handleKeyClick = (key) => {
-    if (key === 'רווח' || key === 'Space') {
-      onCharacterClick(' ');
-    } else {
-      onCharacterClick(key);
-    }
+    onCharacterClick((key === 'רווח' || key === 'Space') ? ' ' : key);
   };
 
   const handleLanguageSelect = (lang) => {
@@ -71,53 +55,48 @@ function VirtualKeyboard({ onCharacterClick }) {
 
   return (
     <div className="virtual-keyboard">
-      {/* כפתור בחירת שפה */}
-      <div className="keyboard-header">
-        <div className="language-selector">
-          <button
-            className="current-language-btn"
-            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-          >
-            <span className="language-icon">{languageIcons[currentKeyboard]}</span>
-            <span className="language-name">{languageNames[currentKeyboard]}</span>
-            <span className="dropdown-arrow">{showLanguageMenu ? '▲' : '▼'}</span>
-          </button>
-
-          {/* תפריט בחירת שפה */}
-          {showLanguageMenu && (
-            <div className="language-menu">
-              {Object.keys(keyboards).map(lang => (
-                <button
-                  key={lang}
-                  className={`language-option ${currentKeyboard === lang ? 'active' : ''}`}
-                  onClick={() => handleLanguageSelect(lang)}
-                >
-                  <span className="language-icon">{languageIcons[lang]}</span>
-                  <span className="language-name">{languageNames[lang]}</span>
-                  {currentKeyboard === lang && <span className="check-mark">✓</span>}
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="actions-panel">
+        <div className="actions-column">
+          <button className="action-btn language-btn" onClick={() => setShowLanguageMenu(true)} title="בחר שפה">🌐</button>
+          <button className="action-btn undo-btn" onClick={onUndo} disabled={!canUndo} title="ביטול">↩️</button>
+          <button className="action-btn search-btn" onClick={onToggleSearch} title="חיפוש">🔍</button>
+        </div>
+        <div className="actions-column">
+          <button className="action-btn delete-char-btn" onClick={onDeleteChar} title="מחק תו">⌫</button>
+          <button className="action-btn delete-word-btn" onClick={onDeleteWord} title="מחק מילה">⌫📝</button>
+          <button className="action-btn delete-all-btn" onClick={onDeleteAll} title="מחק הכל">🗑️</button>
         </div>
       </div>
 
-      {/* המקלדת */}
       <div className="keyboard-rows">
-        {keysToShow.map((row, rowIndex) => (
+        {keyboards[currentKeyboard].map((row, rowIndex) => (
           <div key={rowIndex} className="keyboard-row">
-            {row.map((key, keyIndex) => (
+            {row.map((key) => (
               <button
-                key={keyIndex}
-                className={`key-button ${key === 'רווח' || key === 'Space' ? 'space-key' : ''} ${currentKeyboard === 'emoji' ? 'emoji-key' : ''}`}
+                key={key}
+                className={`key-button ${key.includes(' ') ? 'space-key' : ''} ${currentKeyboard === 'emoji' ? 'emoji-key' : ''}`}
                 onClick={() => handleKeyClick(key)}
               >
-                {key}
+                {key === 'Space' ? 'רווח' : key}
               </button>
             ))}
           </div>
         ))}
       </div>
+
+      {showLanguageMenu && (
+        <div className="language-menu-overlay" onClick={() => setShowLanguageMenu(false)}>
+          <div className="language-menu" onClick={(e) => e.stopPropagation()}>
+            {Object.keys(keyboards).map(lang => (
+              <button key={lang} className={`language-option ${currentKeyboard === lang ? 'active' : ''}`} onClick={() => handleLanguageSelect(lang)}>
+                <span className="language-icon">{languageIcons[lang]}</span>
+                <span className="language-name">{languageNames[lang]}</span>
+                {currentKeyboard === lang && <span className="check-mark">✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

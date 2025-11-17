@@ -1,60 +1,74 @@
-/* Header.css - כותרת האפליקציה */
+/* Header.css - כותרת קטנה ויפה */
 
 .header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  padding: 20px 30px;
+  padding: 12px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
+  min-height: 60px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .logo-icon {
-  font-size: 36px;
+  font-size: 28px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .logo h1 {
-  font-size: 28px;
+  font-size: 22px;
   margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
 }
 
 .user-selector {
   background: rgba(255, 255, 255, 0.2);
-  padding: 12px 25px;
-  border-radius: 30px;
+  padding: 8px 20px;
+  border-radius: 25px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .user-selector label {
   color: white;
   font-weight: bold;
-  font-size: 15px;
-  margin-left: 8px;
+  font-size: 14px;
 }
 
 .user-selector select {
-  padding: 8px 15px;
-  border: 2px solid white;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 15px;
   background: white;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
+  font-weight: 600;
 }
 
 .user-selector select:hover {
-  background: #f0f0f0;
+  background: #f8f9fa;
   transform: translateY(-1px);
+  border-color: white;
 }
 
 .user-selector select:focus {
@@ -62,20 +76,30 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
+.header-info {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* responsive */
 @media (max-width: 768px) {
   .header {
+    padding: 10px 15px;
+  }
+  
+  .header-content {
     flex-direction: column;
-    text-align: center;
-    padding: 15px 20px;
     gap: 10px;
   }
   
   .logo h1 {
-    font-size: 24px;
+    font-size: 18px;
   }
   
   .logo-icon {
-    font-size: 30px;
+    font-size: 24px;
   }
 }
